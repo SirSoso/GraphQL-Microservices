@@ -10,7 +10,7 @@ export const getUserFromToken = async (
   authorization?: string
 ): Promise<IUser | null> => {
   if (!authorization) return null;
-  console.log(authorization);
+
   try {
     const token = authorization.replace("Bearer ", "");
 

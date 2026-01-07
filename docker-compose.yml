@@ -1,0 +1,32 @@
+services:
+  # =========================
+  # API GATEWAY
+  # =========================
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "4000:4000"
+    environment:
+      AUTH_SERVICE_URL: http://auth-service:4001/graphql
+    depends_on:
+      auth-service:
+        condition: service_healthy
+
+  # =========================
+  # AUTH SERVICE
+  # =========================
+  auth-service:
+    build: ./services/auth-service
+    container_name: auth-service
+    ports:
+      - "4001:4001"
+    environment:
+      PORT: 4001
+      JWT_SECRET: 9f3c8a4d2b1e7a6f5c9d0e8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a
+      MONGO_URI: mongodb+srv://owner:0wn3r-Us3r-4cceSS!@cluster-0.esajgxb.mongodb.net/
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:4001/graphql"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

@@ -4,13 +4,16 @@ import {
   RemoteGraphQLDataSource,
 } from "@apollo/gateway";
 import express from "express";
+import * as dotenv from "dotenv";
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@as-integrations/express5";
+
+dotenv.config();
 
 async function bootstrap() {
   const gateway = new ApolloGateway({
     supergraphSdl: new IntrospectAndCompose({
-      subgraphs: [{ name: "auth", url: "http://localhost:4001/graphql" }],
+      subgraphs: [{ name: "auth", url: process.env.AUTH_SERVICE_URL! }],
     }),
     buildService({ url }) {
       return new RemoteGraphQLDataSource({
@@ -29,6 +32,7 @@ async function bootstrap() {
   await server.start();
 
   const app = express();
+
   app.use(
     "/graphql",
     express.json(),
@@ -37,8 +41,10 @@ async function bootstrap() {
     })
   );
 
-  app.listen(4000, () =>
-    console.log("Gateway running on http://localhost:4000/graphql")
+  app.listen(process.env.PORT, () =>
+    console.log(
+      `Gateway running on http://localhost:${process.env.PORT}/graphql`
+    )
   );
 }
 
